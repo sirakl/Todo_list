@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -64,14 +65,9 @@ public class EditorActivity extends AppCompatActivity {
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-
-                String selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
-
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("selected_date", selectedDate);
-
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                calendarView.setDate(calendar.getTimeInMillis());
             }
         });
 
@@ -113,7 +109,7 @@ public class EditorActivity extends AppCompatActivity {
 
                 String text = etTask.getText().toString().trim();
                 int priority = getPriorityFromViews();
-                Date date = new Date();
+                Date date = new Date(calendarView.getDate());
 
                 final Task task = new Task(text, priority, date);
 
