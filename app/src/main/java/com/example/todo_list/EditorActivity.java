@@ -1,14 +1,18 @@
 package com.example.todo_list;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
@@ -37,6 +41,7 @@ public class EditorActivity extends AppCompatActivity {
 
 
     AppDataBase mdb;
+    CalendarView calendarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +56,24 @@ public class EditorActivity extends AppCompatActivity {
         radioButtonHigh = findViewById(R.id.radButton1);
         radioButtonMedium = findViewById(R.id.radButton2);
         radioButtonLow = findViewById(R.id.radButton3);
+        calendarView=findViewById(R.id.calendar);
 
 
         mdb = AppDataBase.getInstance(getApplicationContext());
+
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+
+                String selectedDate = dayOfMonth + "/" + (month + 1) + "/" + year;
+
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("selected_date", selectedDate);
+
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+            }
+        });
 
         final Intent intent = getIntent();
 
@@ -82,6 +102,7 @@ public class EditorActivity extends AppCompatActivity {
 
 
         }
+
 
 
         buttonAdd.setOnClickListener(new View.OnClickListener() {

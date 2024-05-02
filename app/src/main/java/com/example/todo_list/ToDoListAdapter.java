@@ -35,7 +35,7 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.TaskVi
     public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.add_task, parent, false);
+                .inflate(R.layout.adapter, parent, false);
 
         return new TaskViewHolder(view);
     }
