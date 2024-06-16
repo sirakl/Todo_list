@@ -1,6 +1,7 @@
 package com.example.todo_list;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.Observer;
@@ -8,9 +9,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -24,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     ToDoListAdapter toDoListAdapter;
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
+    Button button;
 
 
 
@@ -39,18 +43,14 @@ public class MainActivity extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
                 Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-             startActivity(intent);
-
-
+                startActivity(intent);
             }
         });
+
 
         toDoListAdapter = new ToDoListAdapter(this);
         appDataBase = AppDataBase.getInstance(getApplicationContext());
