@@ -15,10 +15,12 @@ public class Task {
     private int priority;
     @ColumnInfo(name = "updated_at")
     private Date updatedAt;
-    public Task(String description, int priority, Date updatedAt) {
+    private boolean completed;
+    public Task(String description, int priority, Date updatedAt, boolean completed) {
         this.description = description;
         this.priority = priority;
         this.updatedAt = updatedAt;
+        this.completed=completed;
     }
 
 
@@ -37,6 +39,7 @@ public class Task {
     public Date getUpdatedAt() {
         return updatedAt;
     }
+    public boolean isCompleted(){return completed;}
 
 
     public void setId(long id) {
@@ -54,5 +57,6 @@ public class Task {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+    public void setCompleted(boolean completed){this.completed=completed;}
 }
 

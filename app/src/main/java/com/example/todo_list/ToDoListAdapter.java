@@ -2,6 +2,7 @@ package com.example.todo_list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,55 +10,49 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
 public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.TaskViewHolder> {
-    private static final String DATE_FORMAT = "dd/MM/yyy";
-
-
+    private static final String DATE_FORMAT = "dd/MM/yyyy";
 
     private List<Task> mTaskEntries;
     private Context mContext;
-
     private SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
-
 
     public ToDoListAdapter(Context context) {
         mContext = context;
     }
 
-
     @Override
     public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
         View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.adapter, parent, false);
-
         return new TaskViewHolder(view);
     }
 
-
-
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
-
         Task taskEntry = mTaskEntries.get(position);
         String description = taskEntry.getDescription();
         int priority = taskEntry.getPriority();
-
-        final long id = taskEntry.getId(); // get item id
+        final long id = taskEntry.getId();
         String updatedAt = dateFormat.format(taskEntry.getUpdatedAt());
-
-
-
-
 
         holder.taskDescriptionView.setText(description);
         holder.updatedAtView.setText(updatedAt);
+        holder.priorityView.setText(String.valueOf(priority));
+
+        if (taskEntry.isCompleted()) {
+            holder.taskDescriptionView.setTextColor(Color.GREEN);
+            holder.updatedAtView.setTextColor(Color.GREEN);
+        } else {
+            holder.taskDescriptionView.setTextColor(ContextCompat.getColor(mContext, android.R.color.primary_text_light));
+            holder.updatedAtView.setTextColor(ContextCompat.getColor(mContext, android.R.color.primary_text_light));
+        }
+
 
         String priorityString = "" + priority;
         holder.priorityView.setText(priorityString);
@@ -66,17 +61,15 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.TaskVi
         int priorityColor = getPriorityColor(priority);
         priorityCircle.setColor(priorityColor);
 
-
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext,EditorActivity.class);
-                intent.putExtra("id",id);
+                Intent intent = new Intent(mContext, EditorActivity.class);
+                intent.putExtra("id", id);
                 mContext.startActivity(intent);
             }
         });
     }
-
 
     private int getPriorityColor(int priority) {
         int priorityColor = 0;
@@ -97,7 +90,6 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.TaskVi
         return priorityColor;
     }
 
-
     @Override
     public int getItemCount() {
         if (mTaskEntries == null) {
@@ -116,27 +108,19 @@ public class ToDoListAdapter extends RecyclerView.Adapter<ToDoListAdapter.TaskVi
     }
 
     class TaskViewHolder extends RecyclerView.ViewHolder {
-
-        // Class variables for the task description and priority TextViews
         TextView taskDescriptionView;
         TextView updatedAtView;
         TextView priorityView;
-
+        View completedView;
         View view;
-
-
-
 
         public TaskViewHolder(View itemView) {
             super(itemView);
-
-
             taskDescriptionView = itemView.findViewById(R.id.taskDescription);
             updatedAtView = itemView.findViewById(R.id.taskUpdatedAt);
             priorityView = itemView.findViewById(R.id.priorityTextView);
             view = itemView;
+
         }
-
-
     }
 }

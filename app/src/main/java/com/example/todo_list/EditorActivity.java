@@ -1,11 +1,11 @@
 package com.example.todo_list;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -25,9 +25,11 @@ public class EditorActivity extends AppCompatActivity {
     public static final int PRIORITY_HIGH = 1;
     public static final int PRIORITY_MEDIUM = 2;
     public static final int PRIORITY_LOW = 3;
+    private CheckBox checkBoxCompleted;
 
     Button buttonAdd;
     EditText etTask;
+
     RadioButton radioButtonHigh;
     RadioButton radioButtonMedium;
     RadioButton radioButtonLow;
@@ -41,10 +43,12 @@ public class EditorActivity extends AppCompatActivity {
 
         buttonAdd = findViewById(R.id.saveButton);
         etTask = findViewById(R.id.editTextTaskDescription);
+
         radioButtonHigh = findViewById(R.id.radButton1);
         radioButtonMedium = findViewById(R.id.radButton2);
         radioButtonLow = findViewById(R.id.radButton3);
         calendarView = findViewById(R.id.calendar);
+        checkBoxCompleted = findViewById(R.id.checkboxCompleted);
 
         mdb = AppDataBase.getInstance(getApplicationContext());
 
@@ -61,18 +65,27 @@ public class EditorActivity extends AppCompatActivity {
 
         if (intent != null && intent.hasExtra("id")) {
             buttonAdd.setText("Update");
-            final LiveData<Task> task = mdb.taskDao().getById(intent.getIntExtra("id", 0));
-            EditorScreenViewModel viewModel = new EditorScreenViewModel(mdb, intent.getIntExtra("id", 0));
+            checkBoxCompleted.setVisibility(View.VISIBLE);
 
-            viewModel.getTask().observe(EditorActivity.this, new Observer<Task>() {
+            final LiveData<Task> taskLiveData = mdb.taskDao().getById(intent.getLongExtra("id", 0));
+            taskLiveData.observe(this, new Observer<Task>() {
                 @Override
                 public void onChanged(@Nullable Task task) {
-                    final int priority = task.getPriority();
-                    etTask.setText(task.getDescription());
-                    Toast.makeText(EditorActivity.this, task.getDescription().toString(), Toast.LENGTH_SHORT).show();
-                    setPriority(priority);
+                    taskLiveData.removeObserver(this);
+                    if (task != null) {
+                        etTask.setText(task.getDescription());
+                        setPriority(task.getPriority());
+                        calendarView.setDate(task.getUpdatedAt().getTime());
+                        checkBoxCompleted.setChecked(task.isCompleted());
+                    } else {
+                        Toast.makeText(EditorActivity.this, "Error loading task", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
                 }
             });
+        }
+        else {
+            checkBoxCompleted.setVisibility(View.GONE);
         }
 
         buttonAdd.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +94,7 @@ public class EditorActivity extends AppCompatActivity {
                 String text = etTask.getText().toString().trim();
                 int priority = getPriorityFromViews();
                 Date date = new Date(calendarView.getDate());
+                boolean completed = checkBoxCompleted.isChecked();
 
                 if (text.isEmpty()) {
                     Toast.makeText(EditorActivity.this, "Please enter a task description", Toast.LENGTH_SHORT).show();
@@ -92,13 +106,13 @@ public class EditorActivity extends AppCompatActivity {
                     return;
                 }
 
-                final Task task = new Task(text, priority, date);
+                final Task task = new Task(text, priority, date, completed);
 
                 AppExecutor.getInstance().diskIO().execute(new Runnable() {
                     @Override
                     public void run() {
                         if (intent != null && intent.hasExtra("id")) {
-                            task.setId(intent.getIntExtra("id", 0));
+                            task.setId(intent.getLongExtra("id", 0));
                             mdb.taskDao().updateTask(task);
                         } else {
                             mdb.taskDao().insertTask(task);
@@ -111,7 +125,7 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     public int getPriorityFromViews() {
-        int priority = -1;
+        int priority = PRIORITY_HIGH;
         int checkedId = ((RadioGroup) findViewById(R.id.radioGroup)).getCheckedRadioButtonId();
         if (checkedId == R.id.radButton1) {
             priority = PRIORITY_HIGH;
