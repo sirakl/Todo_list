@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,6 +22,7 @@ import android.view.View;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     private int filter = 0;
+    private List<Task> allTasks = new ArrayList<>();
+    private String searchText = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<Task> tasks) {
                 if (tasks != null) {
-                    List<Task> filteredTasks = filterTasks(tasks);
+                    allTasks = tasks;
+                    List<Task> filteredTasks = filterTasks(allTasks);
                     toDoListAdapter.setTasks(filteredTasks);
                 }
             }
@@ -104,13 +109,32 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     return true;
             }
-        }).collect(Collectors.toList());
+        }).filter(task -> task.getDescription().toLowerCase().contains(searchText.toLowerCase())).collect(Collectors.toList());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_filter, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchText = query;
+                getTasks();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchText = newText;
+                getTasks();
+                return false;
+            }
+        });
+
         return true;
     }
 

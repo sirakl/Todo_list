@@ -7,4 +7,10 @@
         android:orderInCategory="100"
         android:icon="@android:drawable/ic_menu_sort_by_size"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/action_search"
+        android:title="Search"
+        android:icon="@android:drawable/ic_menu_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView"></item>
 </menu>
