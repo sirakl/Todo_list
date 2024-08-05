@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     ToDoListAdapter toDoListAdapter;
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
+    private MainScreenViewModel viewModel;
     private int filter = 0;
     private List<Task> allTasks = new ArrayList<>();
     private String searchText = "";
@@ -40,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        MainScreenViewModelFactory viewModelFactory = new MainScreenViewModelFactory(AppDataBase.getInstance(this));
+        viewModel = new ViewModelProvider(this, viewModelFactory).get(MainScreenViewModel.class);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
