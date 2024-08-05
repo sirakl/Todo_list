@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -86,8 +85,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getTasks() {
-        MainScreenViewModel viewModel = new ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.getApplication())).get(MainScreenViewModel.class);
-        viewModel.getTaskList().observe(MainActivity.this, new Observer<List<Task>>() {
+        appDataBase.taskDao().loadAllTask().observe(MainActivity.this, new Observer<List<Task>>() {
             @Override
             public void onChanged(@Nullable List<Task> tasks) {
                 if (tasks != null) {
